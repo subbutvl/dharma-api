@@ -1,0 +1,100 @@
+[
+  {
+    "id": "ganesha",
+    "slug": "ganesha",
+    "name": "Ganesha",
+    "title": "Remover of Obstacles",
+    "alternateNames": ["Ganapati", "Vinayaka", "Vighneshvara"],
+    "category": "deva",
+    "description": "Elephant-headed son of Shiva and Parvati. Worshipped before new beginnings and revered as the remover of obstacles.",
+
+    "attributes": {
+      "headType": "elephant",
+      "arms": 4,
+      "vehicle": "Mouse",
+      "weapons": ["Axe", "Pasha"],
+      "symbols": ["Broken Tusk", "Modak"],
+      "consort": null
+    },
+
+    "relationships": {
+      "parents": ["shiva", "parvati"],
+      "siblings": ["kartikeya"],
+      "consorts": []
+    },
+
+    "worship": {
+      "majorFestivals": ["Ganesh Chaturthi"],
+      "mantra": "Om Gam Ganapataye Namaha",
+      "slokas": [
+        {
+          "title": "Vakratunda Mahakaya",
+          "text": "Vakratunda Mahakaya Suryakoti Samaprabha..."
+        }
+      ],
+      "temples": [
+        {
+          "name": "Siddhivinayak Temple",
+          "location": "Mumbai"
+        }
+      ]
+    },
+
+    "media": {
+      "primaryImage": null,
+      "gallery": [],
+      "model3d": null,
+      "songs": [],
+      "videos": [],
+      "liveStreams": []
+    },
+
+    "metadata": {
+      "version": 1,
+      "createdAt": "2026-02-25",
+      "updatedAt": null
+    }
+  },
+  {
+    "id": "shiva",
+    "slug": "shiva",
+    "name": "Shiva",
+    "title": "The Destroyer",
+    "alternateNames": ["Mahadeva", "Shankara", "Rudra"],
+    "category": "deva",
+    "description": "One of the Trimurti. Lord of destruction and transformation. Husband of Parvati and father of Ganesha.",
+
+    "attributes": {
+      "headType": "human",
+      "arms": 2,
+      "vehicle": "Nandi (Bull)",
+      "weapons": ["Trishula", "Damru"],
+      "symbols": ["Third Eye", "Crescent Moon"],
+      "consort": "Parvati"
+    },
+
+    "relationships": {
+      "parents": [],
+      "siblings": [],
+      "consorts": ["parvati"],
+      "children": ["ganesha", "kartikeya"]
+    },
+
+    "worship": {
+      "majorFestivals": ["Maha Shivaratri"],
+      "mantra": "Om Namah Shivaya"
+    },
+
+    "media": {
+      "primaryImage": null,
+      "gallery": [],
+      "model3d": null
+    },
+
+    "metadata": {
+      "version": 1,
+      "createdAt": "2026-02-25",
+      "updatedAt": null
+    }
+  }
+]
