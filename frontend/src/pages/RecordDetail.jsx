@@ -2,6 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { fetchJson } from "../lib/api";
 import { firstGalleryUrl } from "../config/explore";
+import {
+  TempleTabbedDetail,
+  TempleSummaryCard,
+} from "../components/TempleFields";
 
 const RESOURCE = {
   slokas: { path: "/slokas", matchKey: "id" },
@@ -117,63 +121,9 @@ function PrimaryPanel({ row, resource }) {
   }
 
   if (resource === "temples") {
-    const name =
-      (row.nameEnglish != null && String(row.nameEnglish)) ||
-      (row.name != null && String(row.name)) ||
-      "Temple";
-    const city =
-      (row.city != null && String(row.city)) ||
-      (row.location != null && String(row.location)) ||
-      "";
-    const overview =
-      (row.overview != null && String(row.overview)) ||
-      (row.significance != null && String(row.significance)) ||
-      "";
-    const tamil = row.nameTamil != null ? String(row.nameTamil) : "";
     return (
-      <div className="space-y-4 text-gray-700 dark:text-gray-300 text-sm">
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {name}
-          </h2>
-          {tamil ? (
-            <p className="text-gray-500 dark:text-gray-400 mt-1">{tamil}</p>
-          ) : null}
-          {city ? (
-            <p className="text-gray-500 dark:text-gray-400 mt-1">{city}</p>
-          ) : null}
-        </div>
-        {overview ? <p className="leading-relaxed">{overview}</p> : null}
-        {(row.sthalaPuranam ||
-          row.literaryBackground ||
-          row.puranaBackground) && (
-          <div className="space-y-2 pt-2 border-t border-gray-200 dark:border-gray-700 text-xs">
-            {row.sthalaPuranam ? (
-              <p>
-                <strong className="text-gray-900 dark:text-white">
-                  Sthala puranam:
-                </strong>{" "}
-                {String(row.sthalaPuranam)}
-              </p>
-            ) : null}
-            {row.literaryBackground ? (
-              <p>
-                <strong className="text-gray-900 dark:text-white">
-                  Literary:
-                </strong>{" "}
-                {String(row.literaryBackground)}
-              </p>
-            ) : null}
-            {row.puranaBackground ? (
-              <p>
-                <strong className="text-gray-900 dark:text-white">
-                  Purana:
-                </strong>{" "}
-                {String(row.puranaBackground)}
-              </p>
-            ) : null}
-          </div>
-        )}
+      <div className="text-sm">
+        <TempleTabbedDetail temple={row} />
       </div>
     );
   }
@@ -249,35 +199,6 @@ function PrimaryPanel({ row, resource }) {
 
   return (
     <p className="text-sm text-gray-500 dark:text-gray-400">No preview.</p>
-  );
-}
-
-/** @param {{ temple: Record<string, unknown> }} props */
-function TempleSnippet({ temple }) {
-  const tName =
-    (temple.nameEnglish != null && String(temple.nameEnglish)) ||
-    (temple.name != null && String(temple.name)) ||
-    "Temple";
-  const tCity =
-    (temple.city != null && String(temple.city)) ||
-    (temple.location != null && String(temple.location)) ||
-    "";
-  const tNote =
-    (temple.overview != null && String(temple.overview)) ||
-    (temple.significance != null && String(temple.significance)) ||
-    "";
-  const tTamil = temple.nameTamil != null ? String(temple.nameTamil) : "";
-  return (
-    <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-1">
-      <p className="font-medium text-gray-900 dark:text-white">{tName}</p>
-      {tTamil ? (
-        <p className="text-sm text-gray-600 dark:text-gray-400">{tTamil}</p>
-      ) : null}
-      {tCity ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400">{tCity}</p>
-      ) : null}
-      {tNote ? <p className="text-sm mt-2 leading-relaxed">{tNote}</p> : null}
-    </div>
   );
 }
 
@@ -533,7 +454,7 @@ function RecordDetail() {
                         to={`/temples/${String(t.id)}`}
                         className="block"
                       >
-                        <TempleSnippet temple={t} />
+                        <TempleSummaryCard temple={t} />
                       </Link>
                     ))
                   ) : (

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { fetchJson } from "../lib/api";
+import { TempleTabbedDetail } from "../components/TempleFields";
 
 function DeityDetail() {
   const { slug } = useParams();
@@ -337,58 +338,33 @@ function DeityDetail() {
               )}
 
               {activeTab === "temples" && (
-                <div className="space-y-4 text-gray-700 dark:text-gray-300">
+                <div className="space-y-6 text-gray-700 dark:text-gray-300">
                   {deity.worship?.temples?.length > 0 ? (
                     deity.worship.temples.map((temple, index) => {
                       const tName = temple.name ?? temple.nameEnglish;
-                      const tCity = temple.location ?? temple.city;
-                      const tNote = temple.significance ?? temple.overview;
-                      const tTamil = temple.nameTamil;
+                      const href =
+                        temple.id != null
+                          ? `/temples/${String(temple.id)}`
+                          : null;
                       return (
                         <div
-                          key={index}
-                          className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-1"
+                          key={temple.id != null ? String(temple.id) : index}
+                          className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-3"
                         >
-                          <p className="font-medium text-gray-900 dark:text-white">
-                            {tName}
-                          </p>
-                          {tTamil ? (
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                              {tTamil}
+                          <div className="flex flex-wrap items-start justify-between gap-2">
+                            <p className="font-medium text-gray-900 dark:text-white text-base">
+                              {tName}
                             </p>
-                          ) : null}
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {tCity}
-                          </p>
-                          {tNote && (
-                            <p className="text-sm mt-2 leading-relaxed">
-                              {tNote}
-                            </p>
-                          )}
-                          {(temple.sthalaPuranam ||
-                            temple.literaryBackground ||
-                            temple.puranaBackground) && (
-                            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 text-xs space-y-2">
-                              {temple.sthalaPuranam && (
-                                <p>
-                                  <strong>Sthala puranam:</strong>{" "}
-                                  {temple.sthalaPuranam}
-                                </p>
-                              )}
-                              {temple.literaryBackground && (
-                                <p>
-                                  <strong>Literary:</strong>{" "}
-                                  {temple.literaryBackground}
-                                </p>
-                              )}
-                              {temple.puranaBackground && (
-                                <p>
-                                  <strong>Purana:</strong>{" "}
-                                  {temple.puranaBackground}
-                                </p>
-                              )}
-                            </div>
-                          )}
+                            {href ? (
+                              <Link
+                                to={href}
+                                className="text-xs text-blue-600 dark:text-blue-400 hover:underline shrink-0"
+                              >
+                                Full page →
+                              </Link>
+                            ) : null}
+                          </div>
+                          <TempleTabbedDetail temple={temple} compact />
                         </div>
                       );
                     })

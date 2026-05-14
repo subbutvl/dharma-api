@@ -19,6 +19,7 @@ function toPublicDeity(row, extra = {}) {
   }));
 
   const dbTemples = (extra.temples || []).map((t) => ({
+    id: t.id,
     name: t.nameEnglish,
     location: t.city,
     significance: t.overview,
