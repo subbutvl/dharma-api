@@ -15,6 +15,7 @@ https://keepachangelog.com/en/1.0.0/
 - REST routes under `/api` and `/v1`: deities (list with `q`, `category`, `page`, `limit`), nested deity resources, slokas, temples, avatars, songs, festivals, mythical-beings.
 - `prisma/seed.js` with Shiva, Vishnu, Devi, Ganesha sample data.
 - Frontend `.env.example` with `VITE_API_BASE_URL`; Home uses API envelope and server-side search.
+- **OpenAPI 3** spec at `backend/docs/openapi.yaml` and **Swagger UI** at `/api-docs`, JSON at `/openapi.json`.
 
 ### Changed
 

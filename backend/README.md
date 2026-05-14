@@ -16,6 +16,8 @@ It is responsible for:
 - Node.js
 - Express
 - Supabase (PostgreSQL)
+- Prisma ORM
+- OpenAPI 3 + Swagger UI (`swagger-ui-express`, `js-yaml`)
 - dotenv
 - cors
 
@@ -26,12 +28,14 @@ It is responsible for:
 ```
 backend/
 │
+├── docs/
+│   └── openapi.yaml   # OpenAPI 3 spec (source for Swagger UI)
+├── prisma/
 ├── src/
 │   ├── routes/
-│   ├── controllers/
-│   ├── services/
 │   ├── db/
-│   └── app.js
+│   ├── utils/
+│   └── server.js
 │
 ├── package.json
 ├── .env
@@ -84,11 +88,30 @@ node src/server.js
 
 ---
 
+## API documentation (OpenAPI / Swagger)
+
+The machine-readable contract lives in **[docs/openapi.yaml](docs/openapi.yaml)** (OpenAPI 3).
+
+After `npm run dev` or `npm start`:
+
+| URL                                                                      | Purpose                                                                                                                                                             |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [http://localhost:5000/](http://localhost:5000/)                         | **Dashboard** — Swagger in a **new tab**; OpenAPI JSON and **GET route previews** (click a path) in the **700px side panel**; health & meta in **readable dialogs** |
+| [http://localhost:5000/api-docs](http://localhost:5000/api-docs)         | **Swagger UI** (interactive docs)                                                                                                                                   |
+| [http://localhost:5000/openapi.json](http://localhost:5000/openapi.json) | Same spec as JSON (import into Postman, etc.)                                                                                                                       |
+| [http://localhost:5000/health/db](http://localhost:5000/health/db)       | Database health JSON                                                                                                                                                |
+| [http://localhost:5000/api/meta](http://localhost:5000/api/meta)         | Runtime meta JSON                                                                                                                                                   |
+
+**Maintenance:** When you add or change routes under `src/routes/` or `server.js`, update `docs/openapi.yaml` in the same PR so docs stay accurate. The `/api` paths are canonical; `/v1` is an alias (not duplicated in the YAML).
+
+---
+
 ## 🌐 Example Endpoints
 
 Both `/api` and `/v1` prefixes are supported.
 
 ```
+GET /
 GET /api/deities?q=shiva&category=deva&page=1&limit=20
 GET /api/deities/:slug
 GET /api/deities/:slug/slokas
@@ -103,6 +126,8 @@ GET /api/festivals
 GET /api/mythical-beings
 GET /api/mythical-beings/:slug
 GET /api/meta
+GET /api-docs
+GET /openapi.json
 GET /health/db
 ```
 

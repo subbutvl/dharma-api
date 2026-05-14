@@ -1,7 +1,11 @@
 require("dotenv").config();
 
+const path = require("path");
+const fs = require("fs");
 const express = require("express");
 const cors = require("cors");
+const swaggerUi = require("swagger-ui-express");
+const yaml = require("js-yaml");
 
 const prisma = require("./db/prisma");
 const deityRoutes = require("./routes/deity.routes");
@@ -11,14 +15,36 @@ const avatarRoutes = require("./routes/avatar.routes");
 const songRoutes = require("./routes/song.routes");
 const festivalRoutes = require("./routes/festival.routes");
 const mythicalRoutes = require("./routes/mythical.routes");
+const { buildDashboardHtml } = require("./utils/dashboardHtml");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("🕉 Dharma API Running");
+const openApiPath = path.join(__dirname, "..", "docs", "openapi.yaml");
+let openApiSpec = null;
+try {
+  openApiSpec = yaml.load(fs.readFileSync(openApiPath, "utf8"));
+} catch (e) {
+  console.warn("OpenAPI spec not loaded:", e.message);
+}
+
+if (openApiSpec) {
+  app.use(
+    "/api-docs",
+    swaggerUi.serve,
+    swaggerUi.setup(openApiSpec, {
+      explorer: true,
+    }),
+  );
+  app.get("/openapi.json", (_req, res) => {
+    res.json(openApiSpec);
+  });
+}
+
+app.get("/", (_req, res) => {
+  res.type("html").send(buildDashboardHtml(openApiSpec));
 });
 
 app.get("/health/db", async (_req, res) => {
@@ -85,6 +111,11 @@ async function main() {
 
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Dashboard: http://localhost:${PORT}/`);
+    if (openApiSpec) {
+      console.log(`API docs (Swagger UI): http://localhost:${PORT}/api-docs`);
+      console.log(`OpenAPI JSON: http://localhost:${PORT}/openapi.json`);
+    }
   });
 }
 

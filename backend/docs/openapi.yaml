@@ -1,0 +1,702 @@
+openapi: 3.0.3
+info:
+  title: Dharma API
+  description: |
+    REST API for Hindu mythology data (deities, slokas, temples, etc.).
+
+    **Versioning:** All paths under `/api/...` are mirrored under `/v1/...` (same handlers).
+    This spec documents the `/api` prefix; substitute `/v1` for the same routes.
+
+    **Envelope:** Most JSON endpoints return `{ "success": true, "data": ... }` or
+    `{ "success": true, "data": ..., "meta": { "page", "limit", "total" } }`.
+    Errors return `{ "success": false, "message": "...", "code": "..." }`.
+  version: 0.2.0
+
+servers:
+  - url: http://localhost:5000
+    description: Local development
+
+tags:
+  - name: Meta
+  - name: Health
+  - name: Deities
+  - name: Slokas
+  - name: Temples
+  - name: Avatars
+  - name: Songs
+  - name: Festivals
+  - name: MythicalBeings
+
+paths:
+  /:
+    get:
+      tags: [Meta]
+      summary: Root ping
+      responses:
+        "200":
+          description: Plain text status
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Dharma API Running"
+
+  /health/db:
+    get:
+      tags: [Health]
+      summary: Database connectivity check
+      responses:
+        "200":
+          description: Connected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthDbOk"
+        "503":
+          description: Database unreachable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthDbError"
+
+  /api/meta:
+    get:
+      tags: [Meta]
+      summary: Public config (e.g. storage bucket name)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessMetaConfig"
+
+  /api/deities:
+    get:
+      tags: [Deities]
+      summary: List deities
+      parameters:
+        - name: q
+          in: query
+          description: Search by name, slug, or alias (substring)
+          schema:
+            type: string
+        - name: category
+          in: query
+          description: Filter by category; use `all` or omit for no filter
+          schema:
+            type: string
+            example: deva
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Paginated list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeityListResponse"
+
+  /api/deities/{slug}:
+    get:
+      tags: [Deities]
+      summary: Get deity by slug
+      parameters:
+        - $ref: "#/components/parameters/DeitySlug"
+      responses:
+        "200":
+          description: Deity detail (merged slokas/temples from DB)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeityDetailResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/deities/{slug}/slokas:
+    get:
+      tags: [Deities, Slokas]
+      summary: Slokas for a deity
+      parameters:
+        - $ref: "#/components/parameters/DeitySlug"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SlokaArrayResponse"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/deities/{slug}/temples:
+    get:
+      tags: [Deities, Temples]
+      summary: Temples for a deity
+      parameters:
+        - $ref: "#/components/parameters/DeitySlug"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TempleArrayResponse"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/deities/{slug}/avatars:
+    get:
+      tags: [Deities, Avatars]
+      summary: Avatars/forms for a deity
+      parameters:
+        - $ref: "#/components/parameters/DeitySlug"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AvatarArrayResponse"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/deities/{slug}/festivals:
+    get:
+      tags: [Deities, Festivals]
+      summary: Festivals linked to a deity
+      parameters:
+        - $ref: "#/components/parameters/DeitySlug"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FestivalArrayResponse"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/slokas:
+    get:
+      tags: [Slokas]
+      summary: List all slokas (includes deity slug/name)
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SlokaWithDeityArrayResponse"
+
+  /api/temples:
+    get:
+      tags: [Temples]
+      summary: List all temples
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TempleWithDeityArrayResponse"
+
+  /api/avatars:
+    get:
+      tags: [Avatars]
+      summary: List all avatars
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AvatarWithDeityArrayResponse"
+
+  /api/songs:
+    get:
+      tags: [Songs]
+      summary: List song metadata (external URLs only)
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SongWithDeityArrayResponse"
+
+  /api/festivals:
+    get:
+      tags: [Festivals]
+      summary: List festivals
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FestivalArrayFlatResponse"
+
+  /api/mythical-beings:
+    get:
+      tags: [MythicalBeings]
+      summary: List mythical beings
+      parameters:
+        - name: kind
+          in: query
+          description: Filter by kind (e.g. asura, yaksha, naga, mythical)
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MythicalBeingArrayResponse"
+
+  /api/mythical-beings/{slug}:
+    get:
+      tags: [MythicalBeings]
+      summary: Get mythical being by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MythicalBeingResponse"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  parameters:
+    DeitySlug:
+      name: slug
+      in: path
+      required: true
+      schema:
+        type: string
+      example: shiva
+
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+        code:
+          type: string
+          example: NOT_FOUND
+
+    HealthDbOk:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: true
+        database:
+          type: string
+          example: connected
+
+    HealthDbError:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: false
+        database:
+          type: string
+        message:
+          type: string
+
+    SuccessMetaConfig:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            storageBucket:
+              type: string
+              nullable: true
+
+    PaginationMeta:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+
+    DeityListItem:
+      type: object
+      description: Summary row for list endpoint
+      properties:
+        id:
+          type: string
+        slug:
+          type: string
+        name:
+          type: string
+        title:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        category:
+          type: string
+        alternateNames:
+          type: array
+          items:
+            type: string
+        aliases:
+          type: array
+          items:
+            type: string
+        affiliation:
+          type: string
+          nullable: true
+        abode:
+          type: string
+          nullable: true
+
+    DeityListResponse:
+      type: object
+      required: [success, data, meta]
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/DeityListItem"
+        meta:
+          $ref: "#/components/schemas/PaginationMeta"
+
+    DeityDetail:
+      type: object
+      description: Public deity shape (includes nested worship/attributes JSON)
+      additionalProperties: true
+
+    DeityDetailResponse:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/DeityDetail"
+
+    Sloka:
+      type: object
+      properties:
+        id:
+          type: string
+        deityId:
+          type: string
+        title:
+          type: string
+          nullable: true
+        sanskrit:
+          type: string
+        transliteration:
+          type: string
+          nullable: true
+        meaning:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    SlokaArrayResponse:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Sloka"
+
+    SlokaWithDeity:
+      allOf:
+        - $ref: "#/components/schemas/Sloka"
+        - type: object
+          properties:
+            deity:
+              type: object
+              properties:
+                slug:
+                  type: string
+                name:
+                  type: string
+
+    SlokaWithDeityArrayResponse:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/SlokaWithDeity"
+
+    Temple:
+      type: object
+      properties:
+        id:
+          type: string
+        deityId:
+          type: string
+        name:
+          type: string
+        location:
+          type: string
+        significance:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          format: float
+          nullable: true
+        longitude:
+          type: number
+          format: float
+          nullable: true
+
+    TempleArrayResponse:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Temple"
+
+    TempleWithDeity:
+      allOf:
+        - $ref: "#/components/schemas/Temple"
+        - type: object
+          properties:
+            deity:
+              type: object
+              properties:
+                slug:
+                  type: string
+                name:
+                  type: string
+
+    TempleWithDeityArrayResponse:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/TempleWithDeity"
+
+    Avatar:
+      type: object
+      properties:
+        id:
+          type: string
+        deityId:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        tradition:
+          type: string
+          nullable: true
+
+    AvatarArrayResponse:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Avatar"
+
+    AvatarWithDeity:
+      allOf:
+        - $ref: "#/components/schemas/Avatar"
+        - type: object
+          properties:
+            deity:
+              type: object
+              properties:
+                slug:
+                  type: string
+                name:
+                  type: string
+
+    AvatarWithDeityArrayResponse:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/AvatarWithDeity"
+
+    Song:
+      type: object
+      properties:
+        id:
+          type: string
+        deityId:
+          type: string
+          nullable: true
+        title:
+          type: string
+        credit:
+          type: string
+          nullable: true
+        externalUrl:
+          type: string
+        licenseNote:
+          type: string
+          nullable: true
+
+    SongWithDeity:
+      allOf:
+        - $ref: "#/components/schemas/Song"
+        - type: object
+          properties:
+            deity:
+              type: object
+              nullable: true
+              properties:
+                slug:
+                  type: string
+                name:
+                  type: string
+
+    SongWithDeityArrayResponse:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/SongWithDeity"
+
+    Festival:
+      type: object
+      properties:
+        id:
+          type: string
+        slug:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+
+    FestivalArrayResponse:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Festival"
+
+    FestivalArrayFlatResponse:
+      $ref: "#/components/schemas/FestivalArrayResponse"
+
+    MythicalBeing:
+      type: object
+      properties:
+        id:
+          type: string
+        slug:
+          type: string
+        name:
+          type: string
+        kind:
+          type: string
+        description:
+          type: string
+          nullable: true
+        lore:
+          nullable: true
+
+    MythicalBeingArrayResponse:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/MythicalBeing"
+
+    MythicalBeingResponse:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/MythicalBeing"
