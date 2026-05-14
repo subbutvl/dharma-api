@@ -6,6 +6,20 @@ The project follows a bi-weekly release cycle with 10–20 hours per week effort
 
 ---
 
+## API direction — deeper platform (in development, release upcoming)
+
+A **much deeper, more detailed, and more robust** public API surface is **under active development** and **scheduled for release soon**. The goal is not a thin CRUD wrapper around static tables, but a **platform-shaped** contract that remains:
+
+- **Extendable** — new entity types, fields, and relationships can land without breaking existing clients (additive schema evolution, clear versioning story, documented deprecations where needed).
+- **Customizable** — consumers can opt into projections, filters, and related data with predictable query parameters rather than one-size-fits-all payloads.
+- **Future-proof** — stable resource identifiers, machine-readable **OpenAPI** as the source of truth, envelope conventions that support pagination, errors, and optional metadata as the catalogue grows.
+
+Work in this stream includes tightening **consistency across resources** (temples, slokas, festivals, mythical beings, media metadata), **richer domain modeling** where the data supports it, and **operational hardening** (observability, rate limits, and optional access patterns) as traffic and partners appear. The phased plan below remains the backbone; the upcoming release **elevates** the same roadmap into a **long-lived, evolvable API** suitable for serious integrations.
+
+Watch this repository and **`CHANGELOG.md`** for the cut-over announcement and migration notes when the release ships.
+
+---
+
 # 🚀 Phase 0 – Proof of Concept (Weekend Sprint)
 
 Goal:
