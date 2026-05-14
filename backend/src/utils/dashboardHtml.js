@@ -347,6 +347,11 @@ function buildDashboardHtml(spec) {
         <p class="card-desc">Storage and config fields in a readable dialog.</p>
         <div class="card-path">/api/meta</div>
       </button>
+      <a class="card card-link" href="/admin">
+        <div class="card-title">Data admin <span class="arrow">→</span></div>
+        <p class="card-desc">Add deities, slokas, temples, and more — one record or CSV bulk. Sample CSVs under <code>/admin/samples/</code>.</p>
+        <div class="card-path">/admin</div>
+      </a>
     </div>
 
     <div class="panel">

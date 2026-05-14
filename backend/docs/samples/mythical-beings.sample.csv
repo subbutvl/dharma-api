@@ -1,0 +1,2 @@
+slug,name,kind,description,lore_json
+sample-yaksha,Sample Yaksha,yaksha,Optional prose description.,"{""region"":""example""}"

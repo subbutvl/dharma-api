@@ -1,0 +1,2 @@
+slug,name,title,category,aliases,description,description_en,description_ta,affiliation,abode,primary_image_url,attributes_json,relationships_json,worship_json,media_json
+sample-deity,Sample Deity,Example title,deva,Alias One|Alias Two,Short description for bulk import demo.,English description.,Tamil optional text.,Shaivism,Kailasa,,,,,

@@ -15,9 +15,14 @@ const avatarRoutes = require("./routes/avatar.routes");
 const songRoutes = require("./routes/song.routes");
 const festivalRoutes = require("./routes/festival.routes");
 const mythicalRoutes = require("./routes/mythical.routes");
+const adminRoutes = require("./routes/admin.routes");
 const { buildDashboardHtml } = require("./utils/dashboardHtml");
+const { buildAdminHtml } = require("./utils/adminHtml");
 
 const app = express();
+
+const samplesDir = path.join(__dirname, "..", "docs", "samples");
+app.use("/admin/samples", express.static(samplesDir));
 
 app.use(cors());
 app.use(express.json());
@@ -46,6 +51,12 @@ if (openApiSpec) {
 app.get("/", (_req, res) => {
   res.type("html").send(buildDashboardHtml(openApiSpec));
 });
+
+app.get("/admin", (_req, res) => {
+  res.type("html").send(buildAdminHtml());
+});
+
+app.use("/api/admin", adminRoutes);
 
 app.get("/health/db", async (_req, res) => {
   try {
@@ -112,6 +123,7 @@ async function main() {
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
     console.log(`Dashboard: http://localhost:${PORT}/`);
+    console.log(`Data admin: http://localhost:${PORT}/admin`);
     if (openApiSpec) {
       console.log(`API docs (Swagger UI): http://localhost:${PORT}/api-docs`);
       console.log(`OpenAPI JSON: http://localhost:${PORT}/openapi.json`);

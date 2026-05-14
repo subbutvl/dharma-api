@@ -18,6 +18,7 @@ It is responsible for:
 - Supabase (PostgreSQL)
 - Prisma ORM
 - OpenAPI 3 + Swagger UI (`swagger-ui-express`, `js-yaml`)
+- `multer` + `csv-parse` for admin CSV imports
 - dotenv
 - cors
 
@@ -29,7 +30,8 @@ It is responsible for:
 backend/
 │
 ├── docs/
-│   └── openapi.yaml   # OpenAPI 3 spec (source for Swagger UI)
+│   ├── openapi.yaml   # OpenAPI 3 spec (source for Swagger UI)
+│   └── samples/       # Sample CSVs for /admin bulk import
 ├── prisma/
 ├── src/
 │   ├── routes/
@@ -94,15 +96,23 @@ The machine-readable contract lives in **[docs/openapi.yaml](docs/openapi.yaml)*
 
 After `npm run dev` or `npm start`:
 
-| URL                                                                      | Purpose                                                                                                                                                             |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [http://localhost:5000/](http://localhost:5000/)                         | **Dashboard** — Swagger in a **new tab**; OpenAPI JSON and **GET route previews** (click a path) in the **700px side panel**; health & meta in **readable dialogs** |
-| [http://localhost:5000/api-docs](http://localhost:5000/api-docs)         | **Swagger UI** (interactive docs)                                                                                                                                   |
-| [http://localhost:5000/openapi.json](http://localhost:5000/openapi.json) | Same spec as JSON (import into Postman, etc.)                                                                                                                       |
-| [http://localhost:5000/health/db](http://localhost:5000/health/db)       | Database health JSON                                                                                                                                                |
-| [http://localhost:5000/api/meta](http://localhost:5000/api/meta)         | Runtime meta JSON                                                                                                                                                   |
+| URL                                                                      | Purpose                                                                                                                                                                                  |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [http://localhost:5000/](http://localhost:5000/)                         | **Dashboard** — Swagger in a **new tab**; OpenAPI JSON and **GET route previews** (click a path) in the **700px side panel**; health & meta in **readable dialogs**; **Data admin** link |
+| [http://localhost:5000/admin](http://localhost:5000/admin)               | **Data admin** — forms + CSV bulk import for deities, slokas, temples, avatars, songs, festivals, mythical beings; sample CSVs at `/admin/samples/*.sample.csv`                          |
+| [http://localhost:5000/api-docs](http://localhost:5000/api-docs)         | **Swagger UI** (interactive docs)                                                                                                                                                        |
+| [http://localhost:5000/openapi.json](http://localhost:5000/openapi.json) | Same spec as JSON (import into Postman, etc.)                                                                                                                                            |
+| [http://localhost:5000/health/db](http://localhost:5000/health/db)       | Database health JSON                                                                                                                                                                     |
+| [http://localhost:5000/api/meta](http://localhost:5000/api/meta)         | Runtime meta JSON                                                                                                                                                                        |
 
 **Maintenance:** When you add or change routes under `src/routes/` or `server.js`, update `docs/openapi.yaml` in the same PR so docs stay accurate. The `/api` paths are canonical; `/v1` is an alias (not duplicated in the YAML).
+
+### Data admin (CSV + forms)
+
+- **UI:** [http://localhost:5000/admin](http://localhost:5000/admin) — tabbed forms for single rows and CSV upload per entity.
+- **API:** `POST /api/admin/<resource>` (JSON) and `POST /api/admin/<resource>/import` (multipart field `file`, UTF-8 CSV). See `src/routes/admin.routes.js` for field names.
+- **Samples:** `docs/samples/*.sample.csv` — also served with `Content-Disposition` download at `/admin/samples/<filename>`.
+- **Auth:** If `ADMIN_TOKEN` is set in `.env`, every admin write must send header `x-admin-token: <same value>`. The `/admin` page stores it in `localStorage` after you click **Remember in browser**. `GET /api/admin/status` returns `{ tokenRequired: boolean }` without a token.
 
 ---
 
