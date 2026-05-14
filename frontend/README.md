@@ -4,6 +4,8 @@ React (Vite) + Tailwind app for browsing **deities**, **slokas**, **temples**, *
 
 This package lives beside `backend/` in the same repository. Run the API before the UI.
 
+**Other docs:** [Repository README](../README.md) (overview + **phase status table**) · [Backend README](../backend/README.md) (API server, Swagger, admin, Prisma scripts)
+
 ---
 
 ## Repository layout
