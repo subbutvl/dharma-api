@@ -5,15 +5,32 @@ function DeityDetail() {
   const { slug } = useParams();
   const [deity, setDeity] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
+    setLoading(true);
+    setError(null);
+    setDeity(null);
     fetch(`${import.meta.env.VITE_API_BASE_URL}/deities/${slug}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setDeity(data.data);
-        setLoading(false);
-      });
+      .then(async (res) => {
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const msg =
+            body.message || body.error || `Request failed (${res.status})`;
+          throw new Error(msg);
+        }
+        const payload = body.data !== undefined ? body.data : body;
+        if (!payload || !payload.slug) {
+          throw new Error("Invalid deity response");
+        }
+        return payload;
+      })
+      .then(setDeity)
+      .catch((err) => {
+        setError(err instanceof Error ? err.message : String(err));
+      })
+      .finally(() => setLoading(false));
   }, [slug]);
 
   if (loading) {
@@ -21,6 +38,25 @@ function DeityDetail() {
       <div className="animate-pulse space-y-4">
         <div className="h-8 bg-gray-300 dark:bg-gray-800 rounded w-1/3"></div>
         <div className="h-40 bg-gray-200 dark:bg-gray-700 rounded"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-4">
+        <nav className="text-sm text-gray-500 dark:text-gray-400">
+          <Link to="/" className="hover:underline">
+            Home
+          </Link>
+        </nav>
+        <p className="text-red-600 dark:text-red-400">{error}</p>
+        <Link
+          to="/"
+          className="inline-block text-blue-600 dark:text-blue-400 hover:underline"
+        >
+          Back to list
+        </Link>
       </div>
     );
   }
@@ -77,7 +113,7 @@ function DeityDetail() {
                          bg-blue-100 dark:bg-blue-900
                          text-blue-600 dark:text-blue-300"
               >
-                {deity.category.toUpperCase()}
+                {(deity.category || "deva").toUpperCase()}
               </span>
             </div>
 
@@ -87,6 +123,7 @@ function DeityDetail() {
                 {[
                   "overview",
                   "worship",
+                  "media",
                   "slokas",
                   "songs",
                   "videos",
@@ -114,22 +151,66 @@ function DeityDetail() {
               {activeTab === "overview" && (
                 <div className="space-y-6">
                   <p className="leading-relaxed">{deity.description}</p>
+                  {(deity.descriptionEn || deity.descriptionTa) && (
+                    <div className="grid sm:grid-cols-2 gap-4 text-sm border-t border-gray-200 dark:border-gray-700 pt-4">
+                      {deity.descriptionEn && (
+                        <div>
+                          <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
+                            English
+                          </h3>
+                          <p className="text-gray-700 dark:text-gray-300">
+                            {deity.descriptionEn}
+                          </p>
+                        </div>
+                      )}
+                      {deity.descriptionTa && (
+                        <div>
+                          <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
+                            Tamil
+                          </h3>
+                          <p className="text-gray-700 dark:text-gray-300">
+                            {deity.descriptionTa}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   <div className="grid sm:grid-cols-2 gap-6 text-sm">
+                    {(deity.affiliation || deity.abode) && (
+                      <div className="sm:col-span-2">
+                        <h3 className="font-semibold mb-2 text-gray-900 dark:text-white">
+                          Lore
+                        </h3>
+                        <ul className="space-y-1">
+                          {deity.affiliation && (
+                            <li>
+                              <strong>Affiliation:</strong> {deity.affiliation}
+                            </li>
+                          )}
+                          {deity.abode && (
+                            <li>
+                              <strong>Abode:</strong> {deity.abode}
+                            </li>
+                          )}
+                        </ul>
+                      </div>
+                    )}
                     <div>
                       <h3 className="font-semibold mb-2 text-gray-900 dark:text-white">
                         Attributes
                       </h3>
                       <ul className="space-y-1">
                         <li>
-                          <strong>Vehicle:</strong> {deity.attributes.vehicle}
+                          <strong>Vehicle:</strong>{" "}
+                          {deity.attributes?.vehicle ?? "—"}
                         </li>
                         <li>
-                          <strong>Arms:</strong> {deity.attributes.arms}
+                          <strong>Arms:</strong> {deity.attributes?.arms ?? "—"}
                         </li>
                         <li>
                           <strong>Weapons:</strong>{" "}
-                          {deity.attributes.weapons.join(", ")}
+                          {(deity.attributes?.weapons || []).join(", ") || "—"}
                         </li>
                       </ul>
                     </div>
@@ -139,7 +220,7 @@ function DeityDetail() {
                         Relationships
                       </h3>
                       <div className="flex flex-wrap gap-2">
-                        {deity.relationships.parents.map((parent) => (
+                        {(deity.relationships?.parents || []).map((parent) => (
                           <Link
                             key={parent}
                             to={`/deities/${parent}`}
@@ -161,30 +242,64 @@ function DeityDetail() {
                 <div className="space-y-3 text-sm">
                   <p>
                     <strong>Major Festivals:</strong>{" "}
-                    {deity.worship.majorFestivals.join(", ")}
+                    {(deity.worship?.majorFestivals || []).join(", ") || "—"}
                   </p>
                   <p>
-                    <strong>Mantra:</strong> {deity.worship.mantra || "N/A"}
+                    <strong>Mantra:</strong> {deity.worship?.mantra || "N/A"}
                   </p>
                 </div>
               )}
 
               {activeTab === "media" && (
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                  No media available yet.
+                <div className="text-sm text-gray-700 dark:text-gray-300 space-y-2">
+                  {deity.primaryImageUrl ? (
+                    <img
+                      src={deity.primaryImageUrl}
+                      alt={deity.name}
+                      className="max-w-full rounded-lg border border-gray-200 dark:border-gray-700"
+                    />
+                  ) : (
+                    <p className="text-gray-500 dark:text-gray-400">
+                      No primary image yet.
+                    </p>
+                  )}
+                  <p className="text-gray-500 dark:text-gray-400">
+                    Gallery and 3D assets will appear here when available.
+                  </p>
                 </div>
               )}
 
               {activeTab === "slokas" && (
                 <div className="space-y-4 text-gray-700 dark:text-gray-300">
-                  {deity.worship.slokas?.length > 0 ? (
+                  {deity.worship?.slokas?.length > 0 ? (
                     deity.worship.slokas.map((sloka, index) => (
                       <div
                         key={index}
                         className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg"
                       >
-                        <h4 className="font-semibold mb-2">{sloka.title}</h4>
-                        <p className="text-sm leading-relaxed">{sloka.text}</p>
+                        <h4 className="font-semibold mb-2">
+                          {sloka.title || "Sloka"}
+                        </h4>
+                        {sloka.sanskrit && (
+                          <p className="text-sm font-medium mb-1">
+                            {sloka.sanskrit}
+                          </p>
+                        )}
+                        {sloka.transliteration && (
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 italic">
+                            {sloka.transliteration}
+                          </p>
+                        )}
+                        {sloka.meaning && (
+                          <p className="text-sm leading-relaxed">
+                            {sloka.meaning}
+                          </p>
+                        )}
+                        {sloka.text && !sloka.sanskrit && (
+                          <p className="text-sm leading-relaxed">
+                            {sloka.text}
+                          </p>
+                        )}
                       </div>
                     ))
                   ) : (
@@ -213,7 +328,7 @@ function DeityDetail() {
 
               {activeTab === "temples" && (
                 <div className="space-y-3 text-gray-700 dark:text-gray-300">
-                  {deity.worship.temples?.length > 0 ? (
+                  {deity.worship?.temples?.length > 0 ? (
                     deity.worship.temples.map((temple, index) => (
                       <div
                         key={index}
@@ -223,6 +338,9 @@ function DeityDetail() {
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                           {temple.location}
                         </p>
+                        {temple.significance && (
+                          <p className="text-sm mt-1">{temple.significance}</p>
+                        )}
                       </div>
                     ))
                   ) : (
@@ -236,7 +354,7 @@ function DeityDetail() {
       </div>
 
       {/* 🔗 Related Deities */}
-      {deity.relationships.parents.length > 0 && (
+      {deity.relationships?.parents?.length > 0 && (
         <div>
           <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
             Related Deities

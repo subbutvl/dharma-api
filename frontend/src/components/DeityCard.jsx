@@ -19,7 +19,7 @@ function DeityCard({ deity }) {
                          bg-blue-100 dark:bg-blue-900
                          text-blue-600 dark:text-blue-300 mb-3"
         >
-          {deity.category.toUpperCase()}
+          {(deity.category || "deva").toUpperCase()}
         </span>
 
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">

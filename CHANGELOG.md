@@ -11,10 +11,19 @@ https://keepachangelog.com/en/1.0.0/
 
 ### Added
 
-- Initial project structure
-- README
-- Roadmap
-- Backend & frontend setup
+- Prisma schema for deities, slokas, temples, avatars, songs, festivals, mythical beings; migration `20250514103000_full_roadmap`.
+- REST routes under `/api` and `/v1`: deities (list with `q`, `category`, `page`, `limit`), nested deity resources, slokas, temples, avatars, songs, festivals, mythical-beings.
+- `prisma/seed.js` with Shiva, Vishnu, Devi, Ganesha sample data.
+- Frontend `.env.example` with `VITE_API_BASE_URL`; Home uses API envelope and server-side search.
+
+### Changed
+
+- Deity data served from PostgreSQL via Prisma instead of static JSON.
+- Unified JSON responses: `{ success, data, meta? }`.
+
+### Fixed
+
+- Deity detail fetch error handling and media tab; optional fields guarded in UI.
 
 ---
 

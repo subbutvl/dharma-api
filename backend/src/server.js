@@ -5,6 +5,12 @@ const cors = require("cors");
 
 const prisma = require("./db/prisma");
 const deityRoutes = require("./routes/deity.routes");
+const slokaRoutes = require("./routes/sloka.routes");
+const templeRoutes = require("./routes/temple.routes");
+const avatarRoutes = require("./routes/avatar.routes");
+const songRoutes = require("./routes/song.routes");
+const festivalRoutes = require("./routes/festival.routes");
+const mythicalRoutes = require("./routes/mythical.routes");
 
 const app = express();
 
@@ -28,7 +34,30 @@ app.get("/health/db", async (_req, res) => {
   }
 });
 
+app.get(["/api/meta", "/v1/meta"], (_req, res) => {
+  res.json({
+    success: true,
+    data: {
+      storageBucket: process.env.SUPABASE_STORAGE_BUCKET || null,
+    },
+  });
+});
+
 app.use("/api/deities", deityRoutes);
+app.use("/api/slokas", slokaRoutes);
+app.use("/api/temples", templeRoutes);
+app.use("/api/avatars", avatarRoutes);
+app.use("/api/songs", songRoutes);
+app.use("/api/festivals", festivalRoutes);
+app.use("/api/mythical-beings", mythicalRoutes);
+
+app.use("/v1/deities", deityRoutes);
+app.use("/v1/slokas", slokaRoutes);
+app.use("/v1/temples", templeRoutes);
+app.use("/v1/avatars", avatarRoutes);
+app.use("/v1/songs", songRoutes);
+app.use("/v1/festivals", festivalRoutes);
+app.use("/v1/mythical-beings", mythicalRoutes);
 
 const PORT = Number(process.env.PORT) || 5000;
 

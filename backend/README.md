@@ -52,13 +52,21 @@ npm install
 
 ### 2️⃣ Create `.env` file
 
-Inside backend folder:
-
 ```
-SUPABASE_URL=your_supabase_url
-SUPABASE_KEY=your_supabase_anon_key
+DATABASE_URL=   # Supabase pooler (transaction, port 6543)
+DIRECT_URL=     # Session pooler or direct host for migrations (port 5432)
 PORT=5000
+# Optional: SUPABASE_STORAGE_BUCKET=  (Phase 8 media)
 ```
+
+Run migrations and seed:
+
+```bash
+npm run db:migrate:deploy
+npm run db:seed
+```
+
+If `migrate deploy` errors with **P3005** (schema already exists from a prior `db push`), run `npm run db:push` to align tables, then `npx prisma migrate resolve --applied 20250514103000_full_roadmap`, then `npm run db:seed`.
 
 ---
 
@@ -71,19 +79,34 @@ npm run dev
 or
 
 ```bash
-node src/app.js
+node src/server.js
 ```
 
 ---
 
 ## 🌐 Example Endpoints
 
+Both `/api` and `/v1` prefixes are supported.
+
 ```
-GET /v1/deities
-GET /v1/deities/:slug
-GET /v1/slokas
-GET /v1/temples
+GET /api/deities?q=shiva&category=deva&page=1&limit=20
+GET /api/deities/:slug
+GET /api/deities/:slug/slokas
+GET /api/deities/:slug/temples
+GET /api/deities/:slug/avatars
+GET /api/deities/:slug/festivals
+GET /api/slokas
+GET /api/temples
+GET /api/avatars
+GET /api/songs
+GET /api/festivals
+GET /api/mythical-beings
+GET /api/mythical-beings/:slug
+GET /api/meta
+GET /health/db
 ```
+
+Responses use `{ "success": true, "data": ..., "meta": { ... } }` where applicable.
 
 ---
 
