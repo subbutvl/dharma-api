@@ -19,9 +19,23 @@ function toPublicDeity(row, extra = {}) {
   }));
 
   const dbTemples = (extra.temples || []).map((t) => ({
-    name: t.name,
-    location: t.location,
-    significance: t.significance,
+    name: t.nameEnglish,
+    location: t.city,
+    significance: t.overview,
+    nameEnglish: t.nameEnglish,
+    nameTamil: t.nameTamil,
+    city: t.city,
+    overview: t.overview,
+    sthalaPuranam: t.sthalaPuranam,
+    literaryBackground: t.literaryBackground,
+    puranaBackground: t.puranaBackground,
+    deitiesText: t.deitiesText,
+    poojaTimings: t.poojaTimings,
+    festivalsEvents: t.festivalsEvents,
+    specialities: t.specialities,
+    howToReach: t.howToReach,
+    contactInfo: t.contactInfo,
+    imageGalleryUrls: t.imageGalleryUrls,
     latitude: t.latitude,
     longitude: t.longitude,
   }));

@@ -52,7 +52,8 @@ const shivaPayload = {
   description:
     "One of the Trimurti. Lord of destruction and transformation. Husband of Parvati and father of Ganesha.",
   descriptionEn: "One of the Trimurti. Lord of transformation.",
-  descriptionTa: "திரிமூர்த்திகளில் ஒருவர்; அழிப்பு மற்றும் மாற்றத்தின் தலைவர்.",
+  descriptionTa:
+    "திரிமூர்த்திகளில் ஒருவர்; அழிப்பு மற்றும் மாற்றத்தின் தலைவர்.",
   category: "deva",
   aliases: ["Mahadeva", "Shankara", "Rudra"],
   affiliation: "Shaivism",
@@ -195,7 +196,8 @@ async function main() {
         slug: "vasuki",
         name: "Vasuki",
         kind: "naga",
-        description: "Serpent king used as churning rope in the Samudra Manthan.",
+        description:
+          "Serpent king used as churning rope in the Samudra Manthan.",
       },
       {
         slug: "hanuman",
@@ -270,7 +272,8 @@ async function main() {
         deityId: shiva.id,
         title: "Shiva Panchakshara",
         sanskrit: "नागेन्द्रहाराय त्रिलोचनाय भस्माङ्गरागाय महेश्वराय ।",
-        transliteration: "Nagendraharaya trilochanaya bhasmangaragaya maheshvaraya",
+        transliteration:
+          "Nagendraharaya trilochanaya bhasmangaragaya maheshvaraya",
         meaning: "Praise of Shiva adorned with serpent and ash.",
       },
       {
@@ -304,9 +307,9 @@ async function main() {
     for (const t of list) {
       templeRows.push({
         deityId: d.id,
-        name: t.name,
-        location: t.location,
-        significance: "Major pilgrimage site",
+        nameEnglish: t.name,
+        city: t.location,
+        overview: "Major pilgrimage site",
         latitude: null,
         longitude: null,
       });
@@ -368,7 +371,9 @@ async function main() {
     ],
   });
 
-  console.log("Seed completed: deities, slokas, temples, avatars, songs, festivals, mythical beings.");
+  console.log(
+    "Seed completed: deities, slokas, temples, avatars, songs, festivals, mythical beings.",
+  );
 }
 
 main()

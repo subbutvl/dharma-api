@@ -1,38 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import { EXPLORE_KINDS } from "../config/explore";
-
-/**
- * @typedef {Record<string, unknown>} ListItem
- */
-
-function ListRow({ title, subtitle, href, meta }) {
-  return (
-    <Link
-      to={href}
-      className="block border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-3
-                 hover:bg-gray-50 dark:hover:bg-gray-900/60 transition-colors"
-    >
-      <div className="flex justify-between gap-3 items-start">
-        <div className="min-w-0">
-          <p className="font-medium text-gray-900 dark:text-white truncate">
-            {title}
-          </p>
-          {subtitle ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mt-0.5">
-              {subtitle}
-            </p>
-          ) : null}
-        </div>
-        {meta ? (
-          <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0 font-mono">
-            {meta}
-          </span>
-        ) : null}
-      </div>
-    </Link>
-  );
-}
+import ExploreResourceCard from "../components/ExploreResourceCard";
 
 function ExploreList() {
   const { kind } = useParams();
@@ -97,24 +66,22 @@ function ExploreList() {
 
   if (loading) {
     return (
-      <div className="max-w-2xl mx-auto space-y-3 animate-pulse">
+      <div className="space-y-3 animate-pulse">
         <div className="h-7 bg-gray-200 dark:bg-gray-800 rounded w-1/3" />
-        <div className="h-16 bg-gray-100 dark:bg-gray-900 rounded" />
-        <div className="h-16 bg-gray-100 dark:bg-gray-900 rounded" />
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="h-48 bg-gray-100 dark:bg-gray-900 rounded-xl" />
+          <div className="h-48 bg-gray-100 dark:bg-gray-900 rounded-xl" />
+        </div>
       </div>
     );
   }
 
   if (error) {
-    return (
-      <p className="text-red-600 dark:text-red-400 max-w-2xl mx-auto">
-        Error: {error}
-      </p>
-    );
+    return <p className="text-red-600 dark:text-red-400">Error: {error}</p>;
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div>
       <h1 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">
         {config.listTitle}
       </h1>
@@ -176,10 +143,16 @@ function ExploreList() {
           Nothing here yet.
         </p>
       ) : (
-        <ul className="space-y-2">
+        <ul className="grid md:grid-cols-2 gap-6 list-none p-0 m-0">
           {cards.map((c) => (
-            <li key={c.href}>
-              <ListRow {...c} />
+            <li key={c.href} className="min-w-0">
+              <ExploreResourceCard
+                to={c.href}
+                title={c.title}
+                subtitle={c.subtitle}
+                badge={c.badge}
+                imageUrl={c.imageUrl}
+              />
             </li>
           ))}
         </ul>

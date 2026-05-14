@@ -491,13 +491,50 @@ components:
           type: string
         deityId:
           type: string
-        name:
+          nullable: true
+        nameEnglish:
           type: string
-        location:
-          type: string
-        significance:
+        nameTamil:
           type: string
           nullable: true
+        city:
+          type: string
+        overview:
+          type: string
+          nullable: true
+        sthalaPuranam:
+          type: string
+          nullable: true
+        literaryBackground:
+          type: string
+          nullable: true
+        puranaBackground:
+          type: string
+          nullable: true
+        deitiesText:
+          type: string
+          nullable: true
+        poojaTimings:
+          type: string
+          nullable: true
+        festivalsEvents:
+          type: string
+          nullable: true
+        specialities:
+          type: string
+          nullable: true
+        howToReach:
+          type: string
+          nullable: true
+        contactInfo:
+          type: string
+          nullable: true
+        imageGalleryUrls:
+          type: array
+          nullable: true
+          items:
+            type: string
+          description: Optional list of image URLs (JSON array in DB)
         latitude:
           type: number
           format: float
@@ -506,6 +543,12 @@ components:
           type: number
           format: float
           nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
 
     TempleArrayResponse:
       type: object

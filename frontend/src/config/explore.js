@@ -9,6 +9,15 @@ function pick(row, key) {
   return v == null ? "" : String(v);
 }
 
+/** @param {unknown} raw */
+export function firstGalleryUrl(raw) {
+  if (raw == null) return null;
+  if (Array.isArray(raw) && raw.length > 0 && typeof raw[0] === "string") {
+    return raw[0];
+  }
+  return null;
+}
+
 /** Explore list config per kind (see ExploreList.jsx). */
 export const EXPLORE_KINDS = {
   deities: {
@@ -35,6 +44,9 @@ export const EXPLORE_KINDS = {
       subtitle: pick(item, "title") || pick(item, "category"),
       href: `/deities/${pick(item, "slug")}`,
       meta: pick(item, "category"),
+      badge: (pick(item, "category") || "deva").toUpperCase(),
+      imageUrl:
+        typeof item.primaryImageUrl === "string" ? item.primaryImageUrl : null,
     }),
     supportsSearch: true,
     supportsCategory: true,
@@ -51,6 +63,10 @@ export const EXPLORE_KINDS = {
     toCard: (item) => {
       const deity =
         item.deity && typeof item.deity === "object" ? item.deity : {};
+      const imageUrl =
+        typeof deity.primaryImageUrl === "string"
+          ? deity.primaryImageUrl
+          : null;
       return {
         title: pick(item, "title") || "Sloka",
         subtitle: deity.name
@@ -58,6 +74,8 @@ export const EXPLORE_KINDS = {
           : pick(item, "deityId"),
         href: `/slokas/${pick(item, "id")}`,
         meta: pick(item, "id").slice(0, 8),
+        badge: "Sloka",
+        imageUrl,
       };
     },
   },
@@ -73,13 +91,20 @@ export const EXPLORE_KINDS = {
     toCard: (item) => {
       const deity =
         item.deity && typeof item.deity === "object" ? item.deity : {};
+      const title = pick(item, "nameEnglish") || pick(item, "name");
+      const city = pick(item, "city") || pick(item, "location");
+      const imageUrl =
+        firstGalleryUrl(item.imageGalleryUrls) ||
+        (typeof deity.primaryImageUrl === "string"
+          ? deity.primaryImageUrl
+          : null);
       return {
-        title: pick(item, "name"),
-        subtitle: deity.name
-          ? `${deity.name} · ${pick(item, "location")}`
-          : pick(item, "location"),
+        title,
+        subtitle: deity.name ? `${deity.name} · ${city}` : city,
         href: `/temples/${pick(item, "id")}`,
-        meta: pick(item, "location"),
+        meta: city,
+        badge: "Temple",
+        imageUrl,
       };
     },
   },
@@ -95,6 +120,10 @@ export const EXPLORE_KINDS = {
     toCard: (item) => {
       const deity =
         item.deity && typeof item.deity === "object" ? item.deity : {};
+      const imageUrl =
+        typeof deity.primaryImageUrl === "string"
+          ? deity.primaryImageUrl
+          : null;
       return {
         title: pick(item, "name"),
         subtitle: deity.name
@@ -102,6 +131,8 @@ export const EXPLORE_KINDS = {
           : pick(item, "tradition"),
         href: `/avatars/${pick(item, "id")}`,
         meta: pick(item, "tradition"),
+        badge: pick(item, "tradition") || "Avatar",
+        imageUrl,
       };
     },
   },
@@ -117,12 +148,18 @@ export const EXPLORE_KINDS = {
     toCard: (item) => {
       const deity =
         item.deity && typeof item.deity === "object" ? item.deity : {};
+      const imageUrl =
+        typeof deity.primaryImageUrl === "string"
+          ? deity.primaryImageUrl
+          : null;
       return {
         title: pick(item, "title"),
         subtitle:
           deity.name || pick(item, "credit") || pick(item, "externalUrl"),
         href: `/songs/${pick(item, "id")}`,
         meta: pick(item, "credit"),
+        badge: "Song",
+        imageUrl,
       };
     },
   },
@@ -138,11 +175,19 @@ export const EXPLORE_KINDS = {
     toCard: (item) => {
       const raw = pick(item, "description");
       const short = raw.length > 120 ? `${raw.slice(0, 120)}…` : raw || "—";
+      const links = Array.isArray(item.deityLinks) ? item.deityLinks : [];
+      const firstDeity = links[0]?.deity;
+      const imageUrl =
+        firstDeity && typeof firstDeity.primaryImageUrl === "string"
+          ? firstDeity.primaryImageUrl
+          : null;
       return {
         title: pick(item, "name"),
         subtitle: short,
         href: `/festivals/${pick(item, "slug")}`,
         meta: pick(item, "slug"),
+        badge: "Festival",
+        imageUrl,
       };
     },
   },
@@ -164,6 +209,8 @@ export const EXPLORE_KINDS = {
       subtitle: pick(item, "kind"),
       href: `/mythical-beings/${pick(item, "slug")}`,
       meta: pick(item, "slug"),
+      badge: pick(item, "kind") || "Mythical",
+      imageUrl: null,
     }),
     supportsKindFilter: true,
   },

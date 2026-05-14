@@ -27,13 +27,13 @@ function MainLayout({ children }) {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950 transition-colors duration-300">
       <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
-        <div className="max-w-3xl mx-auto px-4 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center justify-between gap-4">
             <Link
               to="/deities"
-              className="text-lg font-semibold text-gray-900 dark:text-white shrink-0"
+              className="text-xl font-bold text-gray-900 dark:text-white"
             >
-              Dharma
+              🕉 Dharma API
             </Link>
             <button
               type="button"
@@ -71,7 +71,7 @@ function MainLayout({ children }) {
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-8 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+      <main className="max-w-6xl mx-auto px-6 py-8 text-gray-900 dark:text-gray-100 transition-colors duration-300">
         {children}
       </main>
     </div>

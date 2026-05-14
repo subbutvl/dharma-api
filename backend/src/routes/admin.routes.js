@@ -72,6 +72,93 @@ async function resolveDeityIdBySlug(slug) {
   return d ? d.id : null;
 }
 
+function parseCoord(v) {
+  if (v === "" || v == null) return null;
+  const n = Number.parseFloat(String(v));
+  return Number.isFinite(n) ? n : null;
+}
+
+/** @param {Record<string, unknown>} body */
+function templePayloadFromBody(body) {
+  const nameEnglish = trimOrNull(
+    body.nameEnglish ?? body.name_english ?? body.name,
+  );
+  const city = trimOrNull(body.city ?? body.location);
+  if (!nameEnglish || !city) {
+    throw new Error(
+      "nameEnglish (or name) and city (or location) are required",
+    );
+  }
+  let imageGalleryUrls = body.imageGalleryUrls ?? body.image_gallery_urls;
+  if (typeof imageGalleryUrls === "string" && trimOrNull(imageGalleryUrls)) {
+    imageGalleryUrls = parseOptionalJson(
+      String(imageGalleryUrls),
+      "imageGalleryUrls",
+    );
+  } else if (imageGalleryUrls != null && typeof imageGalleryUrls === "object") {
+    // keep
+  } else {
+    imageGalleryUrls = undefined;
+  }
+  return {
+    nameEnglish,
+    nameTamil: trimOrNull(body.nameTamil ?? body.name_tamil),
+    city,
+    overview: trimOrNull(body.overview ?? body.significance),
+    sthalaPuranam: trimOrNull(body.sthalaPuranam ?? body.sthala_puranam),
+    literaryBackground: trimOrNull(
+      body.literaryBackground ?? body.literary_background,
+    ),
+    puranaBackground: trimOrNull(
+      body.puranaBackground ?? body.purana_background,
+    ),
+    deitiesText: trimOrNull(body.deitiesText ?? body.deities_text),
+    poojaTimings: trimOrNull(body.poojaTimings ?? body.pooja_timings),
+    festivalsEvents: trimOrNull(body.festivalsEvents ?? body.festivals_events),
+    specialities: trimOrNull(body.specialities),
+    howToReach: trimOrNull(body.howToReach ?? body.how_to_reach),
+    contactInfo: trimOrNull(body.contactInfo ?? body.contact_info),
+    imageGalleryUrls,
+    latitude: parseCoord(body.latitude),
+    longitude: parseCoord(body.longitude),
+  };
+}
+
+/** @param {Record<string, unknown>} r normalized CSV row */
+function templePayloadFromRow(r) {
+  const nameEnglish = trimOrNull(r.name_english ?? r.nameEnglish ?? r.name);
+  const city = trimOrNull(r.city ?? r.location);
+  if (!nameEnglish || !city) {
+    throw new Error(
+      "name_english (or name) and city (or location) are required",
+    );
+  }
+  const imgRaw = trimOrNull(r.image_gallery_urls ?? r.imageGalleryUrls);
+  const imageGalleryUrls = imgRaw
+    ? parseOptionalJson(imgRaw, "image_gallery_urls")
+    : undefined;
+  return {
+    nameEnglish,
+    nameTamil: trimOrNull(r.name_tamil ?? r.nameTamil),
+    city,
+    overview: trimOrNull(r.overview ?? r.significance),
+    sthalaPuranam: trimOrNull(r.sthala_puranam ?? r.sthalaPuranam),
+    literaryBackground: trimOrNull(
+      r.literary_background ?? r.literaryBackground,
+    ),
+    puranaBackground: trimOrNull(r.purana_background ?? r.puranaBackground),
+    deitiesText: trimOrNull(r.deities_text ?? r.deitiesText),
+    poojaTimings: trimOrNull(r.pooja_timings ?? r.poojaTimings),
+    festivalsEvents: trimOrNull(r.festivals_events ?? r.festivalsEvents),
+    specialities: trimOrNull(r.specialities),
+    howToReach: trimOrNull(r.how_to_reach ?? r.howToReach),
+    contactInfo: trimOrNull(r.contact_info ?? r.contactInfo),
+    imageGalleryUrls: imageGalleryUrls ?? undefined,
+    latitude: parseCoord(r.latitude),
+    longitude: parseCoord(r.longitude),
+  };
+}
+
 /** @param {{ created: number, errors: { row: number, message: string }[] }} out */
 function runBulk(out, rowIndex, fn) {
   const row = rowIndex + 2;
@@ -244,26 +331,12 @@ router.post("/slokas/import", upload.single("file"), async (req, res) => {
 
 router.post("/temples", express.json({ limit: "512kb" }), async (req, res) => {
   try {
-    const deityId = await resolveDeityIdBySlug(
-      trimOrNull(req.body.deitySlug ?? req.body.deity_slug) || "",
-    );
-    if (!deityId) throw new Error("deitySlug not found");
-    const name = trimOrNull(req.body.name);
-    const location = trimOrNull(req.body.location);
-    if (!name || !location) throw new Error("name and location are required");
-    const lat = req.body.latitude;
-    const lon = req.body.longitude;
+    const deitySlug = trimOrNull(req.body.deitySlug ?? req.body.deity_slug);
+    const deityId = deitySlug ? await resolveDeityIdBySlug(deitySlug) : null;
+    if (deitySlug && !deityId) throw new Error("deitySlug not found");
+    const data = templePayloadFromBody(req.body);
     const row = await prisma.temple.create({
-      data: {
-        deityId,
-        name,
-        location,
-        significance: trimOrNull(req.body.significance),
-        latitude:
-          lat === "" || lat == null ? null : Number.parseFloat(String(lat)),
-        longitude:
-          lon === "" || lon == null ? null : Number.parseFloat(String(lon)),
-      },
+      data: { ...data, deityId },
     });
     ok(res, row);
   } catch (err) {
@@ -295,22 +368,12 @@ router.post("/temples/import", upload.single("file"), async (req, res) => {
   for (let i = 0; i < records.length; i++) {
     const r = records[i];
     await runBulk(out, i, async () => {
-      const deityId = await resolveDeityIdBySlug(r.deity_slug);
-      if (!deityId) throw new Error(`deity_slug not found: ${r.deity_slug}`);
-      const name = trimOrNull(r.name);
-      const location = trimOrNull(r.location);
-      if (!name || !location) throw new Error("name and location are required");
-      const la = trimOrNull(r.latitude);
-      const lo = trimOrNull(r.longitude);
+      const ds = trimOrNull(r.deity_slug);
+      const deityId = ds ? await resolveDeityIdBySlug(ds) : null;
+      if (ds && !deityId) throw new Error(`deity_slug not found: ${ds}`);
+      const data = templePayloadFromRow(r);
       await prisma.temple.create({
-        data: {
-          deityId,
-          name,
-          location,
-          significance: trimOrNull(r.significance),
-          latitude: la == null ? null : Number.parseFloat(la),
-          longitude: lo == null ? null : Number.parseFloat(lo),
-        },
+        data: { ...data, deityId },
       });
     });
   }

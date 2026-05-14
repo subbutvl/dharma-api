@@ -1,2 +1,2 @@
-deity_slug,name,location,significance,latitude,longitude
-ganesha,Sample Temple,Chennai India,Example pilgrimage note for CSV import.,13.0827,80.2707
+deity_slug,name_english,name_tamil,city,overview,sthala_puranam,literary_background,purana_background,deities_text,pooja_timings,festivals_events,specialities,how_to_reach,contact_info,image_gallery_urls,latitude,longitude
+ganesha,Sample Temple,சாம்பிள் கோயில்,Chennai,Example overview text.,,,,,,,,,,13.0827,80.2707

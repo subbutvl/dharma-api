@@ -7,8 +7,12 @@ const router = express.Router();
 router.get("/", async (_req, res) => {
   try {
     const rows = await prisma.temple.findMany({
-      orderBy: [{ name: "asc" }],
-      include: { deity: { select: { slug: true, name: true } } },
+      orderBy: [{ nameEnglish: "asc" }],
+      include: {
+        deity: {
+          select: { id: true, slug: true, name: true, primaryImageUrl: true },
+        },
+      },
     });
     ok(res, rows);
   } catch (err) {

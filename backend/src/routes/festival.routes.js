@@ -8,6 +8,20 @@ router.get("/", async (_req, res) => {
   try {
     const rows = await prisma.festival.findMany({
       orderBy: { name: "asc" },
+      include: {
+        deityLinks: {
+          include: {
+            deity: {
+              select: {
+                id: true,
+                slug: true,
+                name: true,
+                primaryImageUrl: true,
+              },
+            },
+          },
+        },
+      },
     });
     ok(res, rows);
   } catch (err) {

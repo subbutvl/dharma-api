@@ -50,18 +50,30 @@ model Sloka {
 }
 
 model Temple {
-  id           String   @id @default(uuid())
-  deityId      String
-  deity        Deity    @relation(fields: [deityId], references: [id], onDelete: Cascade)
-  name         String
-  location     String
-  significance String?  @db.Text
-  latitude     Float?
-  longitude    Float?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                 String   @id @default(uuid())
+  deityId            String?
+  deity              Deity?   @relation(fields: [deityId], references: [id], onDelete: Cascade)
+  nameEnglish        String
+  nameTamil          String?  @db.VarChar(255)
+  city               String
+  overview           String?  @db.Text
+  sthalaPuranam      String?  @db.Text
+  literaryBackground String?  @db.Text
+  puranaBackground   String?  @db.Text
+  deitiesText        String?  @db.Text
+  poojaTimings       String?  @db.Text
+  festivalsEvents    String?  @db.Text
+  specialities       String?  @db.Text
+  howToReach         String?  @db.Text
+  contactInfo        String?  @db.Text
+  imageGalleryUrls   Json?
+  latitude           Float?
+  longitude          Float?
+  createdAt          DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   @@index([deityId])
+  @@index([city])
 }
 
 model Avatar {

@@ -148,16 +148,27 @@ function buildAdminHtml() {
 
     <section class="panel" data-panel="temples">
       <h2>Temples</h2>
-      <p class="hint">CSV: <code>deity_slug,name,location,significance,latitude,longitude</code></p>
+      <p class="hint">CSV columns: <code>deity_slug</code> (optional), <code>name_english</code>, <code>name_tamil</code>, <code>city</code>, long text fields, <code>image_gallery_urls</code> (JSON), <code>latitude</code>, <code>longitude</code>. Legacy <code>name</code>/<code>location</code>/<code>significance</code> still accepted in CSV.</p>
       <h3>Add one</h3>
       <form class="single" data-json="/api/admin/temples">
         <div class="grid">
-          <label>deitySlug *<select name="deitySlug" class="deity-select" required></select></label>
-          <label>name *<input name="name" required /></label>
-          <label>location *<input name="location" required /></label>
-          <label class="full">significance<textarea name="significance"></textarea></label>
+          <label>deitySlug (optional)<select name="deitySlug" class="deity-select-optional"><option value="">— none —</option></select></label>
+          <label>nameEnglish *<input name="nameEnglish" required /></label>
+          <label>nameTamil<input name="nameTamil" /></label>
+          <label>city *<input name="city" required /></label>
           <label>latitude<input name="latitude" type="number" step="any" /></label>
           <label>longitude<input name="longitude" type="number" step="any" /></label>
+          <label class="full">overview<textarea name="overview" rows="2"></textarea></label>
+          <label class="full">sthalaPuranam<textarea name="sthalaPuranam" rows="2"></textarea></label>
+          <label class="full">literaryBackground<textarea name="literaryBackground" rows="2"></textarea></label>
+          <label class="full">puranaBackground<textarea name="puranaBackground" rows="2"></textarea></label>
+          <label class="full">deitiesText<textarea name="deitiesText" rows="2"></textarea></label>
+          <label class="full">poojaTimings<textarea name="poojaTimings" rows="2"></textarea></label>
+          <label class="full">festivalsEvents<textarea name="festivalsEvents" rows="2"></textarea></label>
+          <label class="full">specialities<textarea name="specialities" rows="2"></textarea></label>
+          <label class="full">howToReach<textarea name="howToReach" rows="2"></textarea></label>
+          <label class="full">contactInfo<textarea name="contactInfo" rows="2"></textarea></label>
+          <label class="full">imageGalleryUrls JSON (optional)<textarea name="imageGalleryUrls" placeholder='["https://..."]'></textarea></label>
         </div>
         <div class="actions"><button type="submit">Create temple</button></div>
       </form>

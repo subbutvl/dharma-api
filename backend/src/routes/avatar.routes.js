@@ -8,7 +8,11 @@ router.get("/", async (_req, res) => {
   try {
     const rows = await prisma.avatar.findMany({
       orderBy: [{ tradition: "asc" }, { name: "asc" }],
-      include: { deity: { select: { slug: true, name: true } } },
+      include: {
+        deity: {
+          select: { id: true, slug: true, name: true, primaryImageUrl: true },
+        },
+      },
     });
     ok(res, rows);
   } catch (err) {
